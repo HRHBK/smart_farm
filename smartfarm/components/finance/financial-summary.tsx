@@ -49,7 +49,7 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
       y: 0,
       transition: {
         delay: i * 0.1,
-        duration: 0.4,
+        duration: 0.5,
         ease: "easeOut"
       }
     })
@@ -63,8 +63,8 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
       icon: ArrowUpRight,
       colorClass: "text-emerald-600 dark:text-emerald-400",
       bgColorClass: "bg-emerald-500/10",
-      borderColorClass: "hover:border-emerald-500/30",
-      gradient: "from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-zinc-900"
+      borderColorClass: "hover:border-emerald-500/40",
+      glowClass: "group-hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
     },
     {
       title: "Total Expenses",
@@ -73,8 +73,8 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
       icon: ArrowDownRight,
       colorClass: "text-rose-600 dark:text-rose-400",
       bgColorClass: "bg-rose-500/10",
-      borderColorClass: "hover:border-rose-500/30",
-      gradient: "from-rose-50/50 to-white dark:from-rose-950/20 dark:to-zinc-900"
+      borderColorClass: "hover:border-rose-500/40",
+      glowClass: "group-hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]"
     },
     {
       title: "Net Cash Flow",
@@ -83,10 +83,8 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
       icon: TrendingUp,
       colorClass: netCashFlow >= 0 ? "text-indigo-600 dark:text-indigo-400" : "text-amber-600 dark:text-amber-400",
       bgColorClass: netCashFlow >= 0 ? "bg-indigo-500/10" : "bg-amber-500/10",
-      borderColorClass: netCashFlow >= 0 ? "hover:border-indigo-500/30" : "hover:border-amber-500/30",
-      gradient: netCashFlow >= 0 
-        ? "from-indigo-50/50 to-white dark:from-indigo-950/20 dark:to-zinc-900"
-        : "from-amber-50/50 to-white dark:from-amber-950/20 dark:to-zinc-900"
+      borderColorClass: netCashFlow >= 0 ? "hover:border-indigo-500/40" : "hover:border-amber-500/40",
+      glowClass: netCashFlow >= 0 ? "group-hover:shadow-[0_0_20px_rgba(99,102,241,0.15)]" : "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]"
     },
     {
       title: "Pending / Overdue",
@@ -95,8 +93,8 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
       icon: Clock,
       colorClass: "text-amber-600 dark:text-amber-400",
       bgColorClass: "bg-amber-500/10",
-      borderColorClass: "hover:border-amber-500/30",
-      gradient: "from-amber-50/50 to-white dark:from-amber-950/20 dark:to-zinc-900"
+      borderColorClass: "hover:border-amber-500/40",
+      glowClass: "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]"
     }
   ];
 
@@ -111,23 +109,23 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
             initial="hidden"
             animate="visible"
             variants={cardVariants as any}
-            whileHover={{ scale: 1.02, y: -2 }}
-            className="w-full"
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="w-full group"
           >
-            <Card className={`overflow-hidden border border-zinc-200/80 bg-gradient-to-br ${card.gradient} transition-all duration-300 dark:border-zinc-800/80 shadow-sm hover:shadow-md ${card.borderColorClass}`}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{card.title}</span>
-                  <div className={`p-2 rounded-xl ${card.bgColorClass} ${card.colorClass}`}>
+            <div className={`overflow-hidden border border-slate-200/50 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl transition-all duration-300 dark:border-zinc-800/50 shadow-sm ${card.borderColorClass} ${card.glowClass}`}>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wide">{card.title}</span>
+                  <div className={`p-2.5 rounded-xl ${card.bgColorClass} ${card.colorClass} transition-transform duration-300 group-hover:scale-110`}>
                     <Icon className="h-5 w-5" />
                   </div>
                 </div>
-                <div className="mt-4">
-                  <h3 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{card.value}</h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{card.description}</p>
+                <div>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">{card.value}</h3>
+                  <p className="text-xs font-medium text-slate-500 dark:text-zinc-500 mt-2">{card.description}</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         );
       })}

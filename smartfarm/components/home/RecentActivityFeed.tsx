@@ -2,40 +2,58 @@
 import React from 'react';
 import { transactions, tasks } from '../../lib/mock-data';
 import { motion } from 'framer-motion';
+import { ArrowUpRight, ArrowDownRight, CheckCircle2, Circle } from 'lucide-react';
+import { formatXAF } from '@/lib/utils';
 
-const list = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.04 } } };
-const row = { hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0 } };
+const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+const row = { hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0, transition: { ease: 'easeOut' } } };
 
 export default function RecentActivityFeed() {
   return (
-    <motion.div initial="hidden" animate="show" variants={list} className="bg-white p-3 rounded-lg shadow-sm">
-      <h3 className="text-sm font-medium mb-2">Recent Activity</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <motion.div initial="hidden" animate="show" variants={container} className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md border border-slate-200/50 dark:border-zinc-800/50 p-5 rounded-2xl shadow-sm">
+        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 tracking-wide uppercase">Recent Transactions</h3>
+        <ul className="space-y-3">
+          {transactions.slice(0,5).map((t) => (
+            <motion.li key={t.id} variants={row} className="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${t.type === 'income' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
+                  {t.type === 'income' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-slate-800 dark:text-zinc-200">{t.description}</div>
+                  <div className="text-xs text-slate-500 dark:text-zinc-500">{new Date(t.date).toLocaleDateString('en-GB')}</div>
+                </div>
+              </div>
+              <div className={`text-sm font-bold ${t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                {t.type === 'income' ? '+' : '-'}{formatXAF(t.amount)}
+              </div>
+            </motion.li>
+          ))}
+        </ul>
+      </motion.div>
 
-      <div className="space-y-3 md:flex md:gap-4 md:space-y-0">
-        <motion.div variants={row} className="flex-1">
-          <div className="text-xs text-slate-500">Transactions</div>
-          <ul className="mt-2 space-y-1">
-            {transactions.slice(0,5).map((t) => (
-              <li key={t.id} className="flex justify-between items-center">
-                <div className="text-sm">{t.description}</div>
-                <div className={`text-xs ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>{t.type === 'income' ? `+FCFA ${t.amount}` : `-FCFA ${t.amount}`}</div>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-
-        <motion.div variants={row} className="flex-1">
-          <div className="text-xs text-slate-500">Tasks</div>
-          <ul className="mt-2 space-y-1">
-            {tasks.slice(0,5).map((g) => (
-              <li key={g.id} className="flex justify-between items-center">
-                <div className="text-sm">{g.title}</div>
-                <div className="text-xs text-slate-500">{g.assignee}</div>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      </div>
-    </motion.div>
+      <motion.div initial="hidden" animate="show" variants={container} className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md border border-slate-200/50 dark:border-zinc-800/50 p-5 rounded-2xl shadow-sm">
+        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 tracking-wide uppercase">Recent Tasks</h3>
+        <ul className="space-y-3">
+          {tasks.slice(0,5).map((g) => (
+            <motion.li key={g.id} variants={row} className="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className={`text-slate-400 ${g.status === 'done' ? 'text-emerald-500' : ''}`}>
+                  {g.status === 'done' ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-slate-800 dark:text-zinc-200">{g.title}</div>
+                  <div className="text-xs text-slate-500 dark:text-zinc-500">Assigned to: <span className="font-medium text-slate-700 dark:text-zinc-400">{g.assignee}</span></div>
+                </div>
+              </div>
+              <div className="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded-md">
+                {new Date(g.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+              </div>
+            </motion.li>
+          ))}
+        </ul>
+      </motion.div>
+    </div>
   );
 }

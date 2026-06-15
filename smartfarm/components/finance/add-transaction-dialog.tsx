@@ -88,7 +88,7 @@ export function AddTransactionDialog({ categories, onAddTransaction }: AddTransa
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer">
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm text-sm font-bold px-5 py-2.5 flex items-center gap-2 cursor-pointer shadow-emerald-500/20">
           <Plus className="h-4 w-4" />
           Add Transaction
         </Button>
@@ -227,7 +227,7 @@ export function AddTransactionDialog({ categories, onAddTransaction }: AddTransa
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm text-xs font-semibold px-4 py-2 flex items-center gap-1.5 cursor-pointer"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm text-sm font-bold px-5 py-2.5 flex items-center gap-2 cursor-pointer shadow-emerald-500/20"
             >
               {isSubmitting ? (
                 <>

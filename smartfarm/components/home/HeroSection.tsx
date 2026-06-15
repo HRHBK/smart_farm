@@ -1,36 +1,78 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { stats } from '../../lib/mock-data';
+import { CloudSun, Sunrise, Sunset, Moon } from 'lucide-react';
+import Image from 'next/image';
 
 const container = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 6 },
-  show: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { ease: 'easeOut', duration: 0.5 } },
 };
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return { text: 'Good morning', Icon: Sunrise };
+  if (hour < 18) return { text: 'Good afternoon', Icon: CloudSun };
+  if (hour < 21) return { text: 'Good evening', Icon: Sunset };
+  return { text: 'Good night', Icon: Moon };
+}
+
 export default function HeroSection() {
+  const [greeting, setGreeting] = useState({ text: 'Welcome', Icon: CloudSun });
+
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
+
+  const GreetingIcon = greeting.Icon;
+
   return (
-    <section className="relative overflow-hidden">
-      <motion.div initial="hidden" animate="show" variants={container} className="bg-gradient-to-r from-violet-600 to-emerald-400 p-4 sm:p-6 rounded-lg text-white">
-        <div className="relative">
-          <motion.div variants={item} className="flex items-start justify-between">
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">SmartFarm</h1>
-              <p className="text-xs sm:text-sm opacity-90">Manage crops, livestock, finance and tasks — responsive & animated</p>
+    <section className="relative overflow-hidden rounded-3xl shadow-xl border border-white/10 dark:border-zinc-800/80">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image 
+          src="/images/hero-bg.png" 
+          alt="Smart Farm Aerial View" 
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/70 to-zinc-900/30"></div>
+        <div className="absolute inset-0 bg-emerald-900/20 mix-blend-multiply"></div>
+      </div>
+
+      <motion.div initial="hidden" animate="show" variants={container} className="relative z-10 p-8 sm:p-10 lg:p-12 text-white">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <motion.div variants={item} className="max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 text-sm font-medium text-emerald-50 shadow-sm">
+              <GreetingIcon className="w-4 h-4 text-emerald-300" />
+              {greeting.text}, Farm Manager
             </div>
-            <div className="text-right text-xs opacity-90">Welcome back</div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 drop-shadow-md">
+              Your Farm, <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-100">Intelligently Managed</span>
+            </h1>
+            <p className="text-base sm:text-lg text-emerald-50/90 max-w-lg font-light leading-relaxed drop-shadow">
+              Overview of crop cycles, financial health, and team tasks. Everything you need to grow efficiently.
+            </p>
           </motion.div>
 
-          <motion.div variants={item} className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <motion.div variants={item} className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full md:w-auto">
             {stats.map((s) => (
-              <motion.div key={s.id} variants={item} whileHover={{ scale: 1.03 }} className="bg-white/20 rounded-md p-2 text-center">
-                <div className="text-xs opacity-90">{s.label}</div>
-                <div className="text-lg font-semibold mt-1">{s.value}</div>
+              <motion.div 
+                key={s.id} 
+                whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.15)' }} 
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-center transition-colors shadow-sm"
+              >
+                <div className="text-xs sm:text-sm text-emerald-100/80 font-medium tracking-wide uppercase mb-1">{s.label}</div>
+                <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-sm">{s.value}</div>
               </motion.div>
             ))}
           </motion.div>
