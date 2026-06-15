@@ -33,8 +33,8 @@ export default function FarmPage() {
   }, [q]);
 
   return (
-    <div className="min-h-screen w-full bg-background px-4 py-6 text-foreground sm:px-6">
-      <div className="mx-auto w-full max-w-3xl">
+    <div className="min-h-[90vh] w-full bg-background px-4 py-6 text-foreground sm:px-6">
+      <div className="mx-auto w-[min(100%,90vw)]">
         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-card-foreground">Farm Management</h1>
