@@ -614,4 +614,67 @@ export const dbService = {
     }
     return true;
   },
+
+  async getFarmProfile(): Promise<{name: string, location?: string} | null> {
+    const farmId = await getFarmId();
+    if (!farmId) return null;
+    const { data, error } = await supabase.from('farm').select('name, location').eq('id', farmId).single();
+    if (error) return null;
+    return data as any;
+  },
+
+  async getFarmTeam(): Promise<any[]> {
+    const farmId = await getFarmId();
+    if (!farmId) return [];
+    const { data, error } = await supabase
+      .from('farm_user_roles')
+      .select('role, users(email)')
+      .eq('farm_id', farmId);
+    if (error) return [];
+    return data || [];
+  },
+
+  async getReportsSummary(): Promise<any> {
+    const farmId = await getFarmId();
+    if (!farmId) return null;
+
+    // Get finance
+    const { data: tx } = await supabase.from('financial_transactions').select('amount, transaction_type, occurred_on').eq('farm_id', farmId);
+    
+    // Group tx by month
+    const financeMap: Record<string, any> = {};
+    (tx || []).forEach((t: any) => {
+      const date = new Date(t.occurred_on);
+      const month = date.toLocaleString('default', { month: 'short' });
+      if (!financeMap[month]) financeMap[month] = { date: month, income: 0, expense: 0 };
+      if (t.transaction_type === 'income') financeMap[month].income += Number(t.amount);
+      else financeMap[month].expense += Number(t.amount);
+    });
+
+    // Get inventory
+    const { data: inv } = await supabase.from('inventory_items').select('item_type, qty').eq('farm_id', farmId);
+    const invMap: Record<string, number> = {};
+    (inv || []).forEach((i: any) => {
+      const cat = i.item_type || 'Other';
+      invMap[cat] = (invMap[cat] || 0) + Number(i.qty || 0);
+    });
+    const inventory = Object.entries(invMap).map(([name, value]) => ({ name, value }));
+
+    // Get crops
+    const { count: fields } = await supabase.from('fields').select('*', { count: 'exact', head: true }).eq('farm_id', farmId);
+    const { data: fieldData } = await supabase.from('fields').select('area_ha').eq('farm_id', farmId);
+    const area = (fieldData || []).reduce((sum: number, f: any) => sum + Number(f.area_ha || 0), 0);
+
+    // Get livestock
+    const { data: liveData } = await supabase.from('livestock_units').select('count, status').eq('farm_id', farmId);
+    const totalLive = (liveData || []).reduce((sum: number, l: any) => sum + Number(l.count || 0), 0);
+    const healthyLive = (liveData || []).filter((l: any) => l.status === 'healthy').length;
+
+    return {
+      finance: Object.values(financeMap),
+      inventory,
+      crops: { fields: fields || 0, area },
+      livestock: { total: totalLive, healthy: healthyLive, herds: liveData?.length || 0 }
+    };
+  }
 };

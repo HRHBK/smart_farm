@@ -4,7 +4,7 @@ import MobileBottomNav from '../layout/MobileBottomNav';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Sprout, Package, Wallet, CheckSquare, LogOut, Info, ChevronRight } from 'lucide-react';
+import { Home, Sprout, Package, Wallet, CheckSquare, LogOut, Info, ChevronRight, Wheat, Beef, BarChart, Settings } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
 
 type Props = {
@@ -13,10 +13,13 @@ type Props = {
 
 const sidebarLinks = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/farm', label: 'Farm', icon: Sprout },
+  { href: '/crops', label: 'Crops', icon: Wheat },
+  { href: '/livestock', label: 'Livestock', icon: Beef },
   { href: '/inventory', label: 'Inventory', icon: Package },
   { href: '/finance', label: 'Finance', icon: Wallet },
   { href: '/tasks', label: 'Tasks', icon: CheckSquare },
+  { href: '/reports', label: 'Reports', icon: BarChart },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 function getInitials(email: string) {

@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { Home, Sprout, Package, Wallet, CheckSquare, LogOut } from 'lucide-react';
+import { Home, Sprout, Package, Wallet, CheckSquare, LogOut, Wheat, Beef, BarChart } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const tabs = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/farm', label: 'Farm', icon: Sprout },
+  { href: '/crops', label: 'Crops', icon: Wheat },
+  { href: '/livestock', label: 'Livestock', icon: Beef },
   { href: '/inventory', label: 'Stock', icon: Package },
-  { href: '/finance', label: 'Finance', icon: Wallet },
-  { href: '/tasks', label: 'Tasks', icon: CheckSquare },
+  { href: '/reports', label: 'Reports', icon: BarChart },
 ];
 
 export default function MobileBottomNav() {
