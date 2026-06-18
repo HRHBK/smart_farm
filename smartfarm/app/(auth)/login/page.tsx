@@ -24,7 +24,11 @@ export default function LoginPage() {
     try { document.title = 'Sign In — SmartFarm'; } catch (_) {}
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    try { document.title = 'Sign In — SmartFarm'; } catch (_) {}
+  }, []);
+
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!email || !password) { setError('Please fill in all fields'); return; }
     if (!isValidEmail(email)) { setError('Enter a valid email address'); return; }

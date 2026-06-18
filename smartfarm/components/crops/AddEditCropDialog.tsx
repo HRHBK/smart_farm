@@ -24,7 +24,7 @@ type Props = {
   onSave: (field: Field) => Promise<boolean>;
 };
 
-export default function AddEditFieldDialog({ open, onOpenChange, field, onSave }: Props) {
+export default function AddEditCropDialog({ open, onOpenChange, field, onSave }: Props) {
   const [title, setTitle] = useState('');
   const [crop, setCrop] = useState('');
   const [area, setArea] = useState('');
