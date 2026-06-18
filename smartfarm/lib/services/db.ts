@@ -534,13 +534,18 @@ export const dbService = {
   async getCategories(): Promise<DbObject[]> {
     const farmId = await getFarmId();
     if (!farmId) return [];
-    const { data, error } = await supabase.from('financial_transaction_categories').select('*').eq('farm_id', farmId);
+    const { data, error } = await supabase
+      .from('financial_transaction_categories')
+      .select('id, name, description')
+      .eq('farm_id', farmId);
     if (error) {
       console.error('Supabase Categories Read Error:', error);
       return [];
     }
-    return data.map((category: DbObject) => ({
-      icon: category.icon || 'circle-dollar-sign',
+    return (data || []).map((category: DbObject) => ({
+      id: category.id,
+      name: category.name || 'Uncategorized',
+      description: category.description || '',
     }));
   },
 
@@ -549,7 +554,7 @@ export const dbService = {
     if (!farmId) return [];
     const { data, error } = await supabase
       .from('tasks')
-      .select('*, status:task_statuses(name), task_assignments(worker_user_id, users(email))')
+      .select('*, status:task_statuses(name), task_assignments(worker_user_id)')
       .eq('farm_id', farmId)
       .order('due_date', { ascending: true });
 
@@ -561,13 +566,15 @@ export const dbService = {
     return data.map((task: DbObject) => {
       const statusObj = task.status as DbObject | undefined;
       const assignments = task.task_assignments as any[] | undefined;
-      const assigneeEmail = assignments && assignments.length > 0 ? assignments[0].users?.email : 'Unassigned';
+      // auth.users isn't directly joinable; show truncated user_id or 'Unassigned'
+      const assigneeId = assignments && assignments.length > 0 ? assignments[0].worker_user_id as string : null;
+      const assigneeLabel = assigneeId ? assigneeId.slice(0, 8) + '…' : 'Unassigned';
       
       return {
         ...task,
         status: typeof statusObj?.name === 'string' ? statusObj.name : 'pending',
         dueDate: task.due_date || null,
-        assignee: task.assignee || assigneeEmail,
+        assignee: task.assignee || assigneeLabel,
       };
     });
   },
@@ -659,9 +666,33 @@ export const dbService = {
   async getFarmProfile(): Promise<{id: string, name: string, location?: string} | null> {
     const farmId = await getFarmId();
     if (!farmId) return null;
-    const { data, error } = await supabase.from('farm').select('id, name, location').eq('id', farmId).single();
+    const { data, error } = await supabase.from('farm').select('id, name, country, region').eq('id', farmId).single();
     if (error) return null;
-    return data as any;
+    const d = data as any;
+    return {
+      id: d.id,
+      name: d.name,
+      location: [d.region, d.country].filter(Boolean).join(', ') || undefined,
+    };
+  },
+
+  async updateFarmProfile(updates: { name?: string; location?: string }): Promise<boolean> {
+    const farmId = await getFarmId();
+    if (!farmId) return false;
+    const payload: DbObject = {};
+    if (updates.name) payload.name = updates.name;
+    // location is stored as "region, country" — split on first comma
+    if (updates.location !== undefined) {
+      const parts = updates.location.split(',').map((s) => s.trim());
+      payload.region = parts[0] || null;
+      payload.country = parts[1] || null;
+    }
+    const { error } = await supabase.from('farm').update(payload).eq('id', farmId);
+    if (error) {
+      console.error('Supabase Farm Profile Update Error:', error);
+      return false;
+    }
+    return true;
   },
 
   async getFarmTeam(): Promise<any[]> {
@@ -669,10 +700,14 @@ export const dbService = {
     if (!farmId) return [];
     const { data, error } = await supabase
       .from('farm_user_roles')
-      .select('role, user_id, users(email)')
+      .select('role, user_id')
       .eq('farm_id', farmId);
     if (error) return [];
-    return data || [];
+    // auth.users is not directly joinable from client; return user_id as display fallback
+    return (data || []).map((row: any) => ({
+      ...row,
+      users: { email: row.user_id },
+    }));
   },
 
   async joinFarm(joinCode: string): Promise<{ success: boolean; error?: string }> {
